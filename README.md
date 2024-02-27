@@ -1,6 +1,6 @@
 # Spring Security
 
-Authentification/Registration/Encoding/CSRF/@PreAuthorize/
+Authentification/Registration/Encoding/CSRF/@PreAuthorize/Swagger/Liquibase
 
 
 ## Running Spring Security
