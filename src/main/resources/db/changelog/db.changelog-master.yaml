@@ -1,0 +1,19 @@
+databaseChangeLog:
+    - changeSet:
+          id: 1
+          author: asike
+          name: db.changelog-master.yaml
+          environment: testing
+          is-enabled: false
+    - changeSet:
+          id: 6
+          author: asike
+          changes:
+              - sqlFile:
+                    path: test.sql
+                    relativeToChangelogFile: true
+
+
+
+
+
