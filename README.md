@@ -1,5 +1,5 @@
 # Information about Spring SecurityApp
-
+This is a Simple Spring Security(For Testing, For Beginners)
 Authentification/Registration/Encoding/CSRF/@PreAuthorize/Swagger/Liquibase
 
 ### Technologies : 
