@@ -1,16 +1,19 @@
 package asylkhan.springcourse.FirstSecurityApp.config;
 
 import asylkhan.springcourse.FirstSecurityApp.security.AuthProviderImpl;
+import asylkhan.springcourse.FirstSecurityApp.security.JWTUtil;
 import asylkhan.springcourse.FirstSecurityApp.services.PersonDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @EnableWebSecurity
@@ -18,10 +21,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthProviderImpl authProvider;
 
+    private final JWTUtil jwtUtil;
+
+    private final JWTFilter jwtFilter;
+
     private final PersonDetailsService personDetailsService;
     @Autowired
-    public SecurityConfig(AuthProviderImpl authProvider, PersonDetailsService personDetailsService) {
+    public SecurityConfig(AuthProviderImpl authProvider, JWTUtil jwtUtil, JWTFilter jwtFilter, PersonDetailsService personDetailsService) {
         this.authProvider = authProvider;
+        this.jwtUtil = jwtUtil;
+        this.jwtFilter = jwtFilter;
         this.personDetailsService = personDetailsService;
     }
 
@@ -34,12 +43,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // конфигурируем сам Spring Security
         // конфигурируем авторизацию
 
-        http.csrf().disable()
+        http
+                .csrf().disable()
                 .authorizeRequests()
-//                .antMatchers("/admin").hasRole("ADMIN")
+                .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/auth/login", "/auth/registration", "/error").permitAll()
-//                .anyRequest().hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
+                .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
                 .formLogin().loginPage("/auth/login")
                 .loginProcessingUrl("/process_login")
@@ -48,7 +57,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutSuccessUrl("/auth/login")
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Spring Security cессия не сохраняется на сервере
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Добавляем фильтр
     }
 
     //     Настраиваем аутентификацию
@@ -61,6 +75,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
 //    @Bean

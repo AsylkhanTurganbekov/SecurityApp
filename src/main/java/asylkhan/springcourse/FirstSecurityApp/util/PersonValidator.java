@@ -1,6 +1,7 @@
 package asylkhan.springcourse.FirstSecurityApp.util;
 
 
+import asylkhan.springcourse.FirstSecurityApp.dto.PersonDTO;
 import asylkhan.springcourse.FirstSecurityApp.models.Person;
 import asylkhan.springcourse.FirstSecurityApp.services.PersonDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,14 @@ public class PersonValidator implements Validator {
 
     @Override
     public void validate(Object o, Errors errors) {
-        Person person = (Person)o;
+        PersonDTO personDTO = (PersonDTO) o;
 
         try {
-            personDetailsService.loadUserByUsername(person.getUsername());
+            personDetailsService.loadUserByUsername(personDTO.getUsername());
+            errors.rejectValue("username", "", "A person with this username already exists.");
         } catch (UsernameNotFoundException ignored) {
-            return; // все ок, пользователь не найден
+            // Everything is fine, the user does not exist
         }
-
-        errors.rejectValue("username", "", "Человек с таким именем пользователя уже существует");
-
     }
+
 }

@@ -1,10 +1,12 @@
 package asylkhan.springcourse.FirstSecurityApp.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import asylkhan.springcourse.FirstSecurityApp.models.Person;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public class PersonDetails implements UserDetails {
     private final Person person;
@@ -15,7 +17,9 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        // SHOW_ACCOUNT, WITHDRAW_MONEY, SEND_MONEY
+        // ROLE_ADMIN, ROLE_USER - это роли
+        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole()));
     }
 
     @Override
